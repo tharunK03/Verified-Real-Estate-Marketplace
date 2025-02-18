@@ -1,16 +1,22 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Register from './components/Register';
-import Login from './components/Login';
-import Dashboard from './components/Dashboard'; // Assuming Dashboard exists
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./components/Dashboard";
+import SellerDashboard from "./components/SellerDashboard";
+import BuyerDashboard from "./components/BuyerDashboard";
+import AdminDashboard from "./components/AdminDashboard";
+import Login from "./components/Login";
+import Register from "./components/Register";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<h1>Welcome to Real Estate Portal</h1>} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
+        <Route path="/seller-dashboard" element={<SellerDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard role={localStorage.getItem('userRole')} />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </Router>
   );

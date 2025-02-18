@@ -1,31 +1,9 @@
-const express = require('express');
-const { createProperty, getAllProperties, verifyProperty } = require('../controllers/propertyController');
-const authMiddleware = require('../middleware/authMiddleware');
-
+const express = require("express");
 const router = express.Router();
+const { createProperty } = require("../controllers/propertyController");
+const { protect } = require("../middleware/authMiddleware");
 
-// Protected routes
-router.post('/create', authMiddleware, createProperty);
-router.get('/', authMiddleware, getAllProperties);
-router.patch('/verify/:propertyId', authMiddleware, verifyProperty);
+// ✅ Secure Route for Property Creation
+router.post("/create", protect, createProperty);
 
 module.exports = router;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
