@@ -1,34 +1,53 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/dashboard.css"; // Ensure CSS styles exist
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "../styles/buyerDashboard.css"; // Ensure CSS exists
 
-const Dashboard = () => {
-  const navigate = useNavigate();
+const BuyerDashboard = () => {
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleSelectRole = (role) => {
-    localStorage.setItem("userRole", role);
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const response = await axios.get("http://localhost:5001/api/properties/verified"); // ✅ Ensure route matches backend
+        setProperties(response.data);
+      } catch (err) {
+        console.error("❌ Error fetching properties:", err);
+        setError("Failed to load properties.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Redirect based on selected role
-    if (role === "buyer") {
-      navigate("/buyer-dashboard");
-    } else if (role === "seller") {
-      navigate("/admin-dashboard");
-    }
-  };
+    fetchProperties();
+  }, []);
+
+  if (loading) return <p>Loading properties...</p>;
+  if (error) return <p className="error">{error}</p>;
 
   return (
-    <div className="dashboard-container">
-      <h2>Select Your Role</h2>
-      <div className="role-selection">
-        <button className="role-btn buyer" onClick={() => handleSelectRole("buyer")}>
-          Buyer
-        </button>
-        <button className="role-btn seller" onClick={() => handleSelectRole("seller")}>
-          Seller
-        </button>
-      </div>
+    <div className="buyer-dashboard">
+      <h1>🏡 Available Properties</h1>
+      {properties.length === 0 ? (
+        <p className="no-properties">🚫 No properties to display</p>
+      ) : (
+        <div className="properties-container">
+          {properties.map((property) => (
+            <div key={property._id} className="property-card">
+              <h3>{property.title}</h3>
+              <p><strong>Type:</strong> {property.type}</p>
+              <p><strong>Location:</strong> {property.location}</p>
+              <p><strong>Price:</strong> ${property.price}</p>
+              <p><strong>Size:</strong> {property.sqft} sqft</p>
+              <img src={`http://localhost:5001/${property.image}`} alt="Property" className="property-img"/>
+              <a href={`http://localhost:5001/${property.document}`} target="_blank" rel="noopener noreferrer" className="view-doc">📄 View Document</a>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-export default Dashboard;
+export default BuyerDashboard;

@@ -1,9 +1,12 @@
 const express = require("express");
-const router = express.Router();
-const { createProperty } = require("../controllers/propertyController");
-const { protect } = require("../middleware/authMiddleware");
+const { createProperty, getVerifiedProperties } = require("../controllers/propertyController"); // ✅ Ensure functions are imported correctly
 
-// ✅ Secure Route for Property Creation
-router.post("/create", protect, createProperty);
+const router = express.Router();
+
+// ✅ Route for creating a property
+router.post("/create", createProperty);
+
+// ✅ Route for fetching only verified properties
+router.get("/verified", getVerifiedProperties);
 
 module.exports = router;

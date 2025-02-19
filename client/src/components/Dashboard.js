@@ -1,60 +1,52 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/dashboard.css"; // Ensure the CSS file exists
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [selectedRole, setSelectedRole] = useState(""); // Stores selected role
+  const [selectedRole, setSelectedRole] = useState("");
 
+  // ✅ Ensure user is logged in before accessing the dashboard
   useEffect(() => {
-    const userRole = localStorage.getItem("userRole"); // Get role from localStorage
-
-    if (!userRole) {
-      navigate("/login"); // Redirect to login if no role is found
-    } else {
-      redirectUser(userRole); // Redirect immediately if user is already logged in
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login"); // Redirect to login if no token
     }
   }, [navigate]);
 
-  // ✅ Redirect User Based on Role
-  const redirectUser = (role) => {
-    switch (role) {
-      case "buyer":
-        navigate("/buyer-dashboard");
-        break;
-      case "seller":
-        navigate("/seller-dashboard");
-        break;
-      case "admin":
-        navigate("/admin-dashboard");
-        break;
-      default:
-        navigate("/");
-    }
-  };
-
-  // ✅ Handle Role Selection Manually
+  // ✅ Handle role selection and navigation
   const handleRoleSelection = () => {
-    if (selectedRole) {
-      localStorage.setItem("userRole", selectedRole); // Save role in localStorage
-      redirectUser(selectedRole);
-    } else {
-      alert("Please select a role!");
+    if (!selectedRole) {
+      alert("⚠️ Please select a role to proceed!");
+      return;
+    }
+
+    localStorage.setItem("userRole", selectedRole);
+
+    if (selectedRole === "buyer") {
+      navigate("/buyer-dashboard"); // ✅ Redirect to Buyer Dashboard
+    } else if (selectedRole === "seller") {
+      navigate("/seller-post-property"); // ✅ Seller must post property first
+    } else if (selectedRole === "renter") {
+      navigate("/renter-dashboard"); // ✅ Redirect to Renter Dashboard
     }
   };
 
   return (
     <div className="dashboard-container">
-      <h1>Welcome to the Real Estate Portal</h1>
-      <p>Select your role to continue:</p>
+      <h1>🏡 Welcome to the Real Estate Portal</h1>
+      <p className="dashboard-subtitle">Select your role to continue:</p>
 
-      <select onChange={(e) => setSelectedRole(e.target.value)}>
-        <option value="">-- Select Role --</option>
-        <option value="buyer">Buyer</option>
-        <option value="seller">Seller</option>
-        <option value="admin">Admin</option>
-      </select>
+      <div className="role-selection">
+        <select value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
+          <option value="">-- Select Role --</option>
+          <option value="buyer">Buyer</option>
+          <option value="renter">Renter</option>
+          <option value="seller">Seller</option>
+        </select>
+      </div>
 
-      <button onClick={handleRoleSelection}>Proceed</button>
+      <button className="proceed-btn" onClick={handleRoleSelection}>Proceed</button>
     </div>
   );
 };

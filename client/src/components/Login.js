@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { FaEnvelope, FaLock } from "react-icons/fa";
+import "../styles/auth.css"; // Ensure you have this CSS file for styling
 
-const Login = () => {
+const API_URL = "http://localhost:5001/api/auth";
+
+export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -10,29 +14,17 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("http://localhost:5001/api/auth/login", { email, password });
+      const { data } = await axios.post(`${API_URL}/login`, { email, password });
 
+      // ✅ Store user token and role in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("userRole", data.user.role);
 
       alert("Login successful!");
-
-      // ✅ Redirect users based on their role
-      switch (data.user.role) {
-        case "buyer":
-          navigate("/buyer-dashboard");
-          break;
-        case "seller":
-          navigate("/seller-dashboard");
-          break;
-        case "admin":
-          navigate("/admin-dashboard");
-          break;
-        default:
-          navigate("/");
-      }
+      navigate("/dashboard"); // ✅ Redirect to Dashboard after login
     } catch (error) {
-      alert("Login failed: " + (error.response?.data?.message || "Try again."));
+      console.error("❌ Login Error:", error.response?.data || error.message);
+      alert("Login failed. Check your credentials.");
     }
   };
 
@@ -40,11 +32,31 @@ const Login = () => {
     <div className="auth-container">
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <button type="submit">Login</button>
+        <div className="input-group">
+          <FaEnvelope className="icon" />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="input-group">
+          <FaLock className="icon" />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit" className="auth-btn">Login</button>
       </form>
-      <p>Don't have an account? <a href="/register">Register</a></p>
+      <div className="auth-footer">
+        Don't have an account? <a href="/register">Sign up</a>
+      </div>
     </div>
   );
 };
